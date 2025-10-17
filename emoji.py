@@ -31,8 +31,8 @@ emote1 = cv2.imread("images.png", cv2.IMREAD_UNCHANGED)
 emote2 = cv2.imread("cheer.webp", cv2.IMREAD_UNCHANGED)
 emote3 = cv2.imread("images.jpg", cv2.IMREAD_UNCHANGED)
 emote4 = cv2.imread("laugh.jpg", cv2.IMREAD_UNCHANGED)
-
-if emote is None or emote1 is None or emote2 is None or emote3 is None or emote4 is None:
+emote5=cv2.imread("Twerkingpig1.jpg",cv2.IMREAD_UNCHANGED)
+if emote is None or emote1 is None or emote2 is None or emote3 is None or emote4 is None or emote5 is None:
     print("Error: Could not load emote images! Make sure the files exist!")
     exit()
 emote = cv2.resize(emote, (150, 150))
@@ -40,7 +40,27 @@ emote1 = cv2.resize(emote1, (150, 150))
 emote2 = cv2.resize(emote2, (150, 150))
 emote3 = cv2.resize(emote3, (150, 150))
 emote4 = cv2.resize(emote4, (150, 150))
+emote5 = cv2.resize(emote5, (150, 150))
 
+def three_fingers_up(multi_hand_landmarks, height):
+    if len(multi_hand_landmarks) != 1:
+        return False
+    for hand_landmarks in multi_hand_landmarks:
+        index_tip = hand_landmarks.landmark[8].y * height
+        index_base = hand_landmarks.landmark[5].y * height
+        middle_tip = hand_landmarks.landmark[12].y * height
+        middle_base = hand_landmarks.landmark[9].y * height
+        ring_tip = hand_landmarks.landmark[16].y * height
+        ring_base = hand_landmarks.landmark[13].y * height
+        pinky_tip = hand_landmarks.landmark[20].y * height
+        pinky_base = hand_landmarks.landmark[17].y * height
+        index_up = index_tip < index_base
+        middle_up = middle_tip < middle_base
+        ring_up = ring_tip < ring_base
+        pinky_down = pinky_tip > pinky_base
+        if index_up and middle_up and ring_up and pinky_down:
+            return True
+    return False
 def peace_sign(multi_hand_landmarks, height):
     if len(multi_hand_landmarks) != 1:
         return False
@@ -223,6 +243,10 @@ while True:
             show_emote = True
             emote_timer = emote_duration
             emote_img_to_show = emote3
+        elif three_fingers_up(result.multi_hand_landmarks, height):
+            show_emote = True
+            emote_timer = emote_duration
+            emote_img_to_show = emote5
 
     if show_emote and emote_timer > 0 and emote_img_to_show is not None:
         img = overlay_emote(img, emote_img_to_show)
